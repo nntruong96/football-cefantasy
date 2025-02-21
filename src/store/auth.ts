@@ -1,25 +1,23 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { User } from "@/types";
+import { create } from "zustand";
 
-interface AuthState {
-  user?: User;
+export interface AuthState {
+  isLoggedIn: boolean;
+  user?: User | null;
 }
 
-const initialState: AuthState = {};
+export interface AuthActions {
+  setUser: (user: User) => void;
+  reset: () => void;
+}
 
-export const authSlice = createSlice({
-  name: "auth",
-  initialState: { ...initialState },
-  reducers: {
-    setAuthUser(state, payload: PayloadAction<User>) {
-      state.user = payload.payload;
-    },
-    resetAuth() {
-      return { ...initialState };
-    },
+export const useAuthStore = create<AuthState & AuthActions>((set, get) => ({
+  isLoggedIn: false,
+  user: null,
+  setUser(user) {
+    set({ ...get(), user, isLoggedIn: true });
   },
-});
-
-export const { setAuthUser } = authSlice.actions;
-
-export default authSlice.reducer;
+  reset() {
+    set({ ...get(), isLoggedIn: false, user: null });
+  },
+}));
